@@ -42,6 +42,9 @@ patch -p1 < ../PATCH/luci-app-firewall_add_sfe_switch.patch
 pushd target/linux/generic/hack-4.14
 wget https://raw.githubusercontent.com/coolsnowwolf/lede/master/target/linux/generic/hack-4.14/999-net-patch-linux-kernel-to-support-shortcut-fe.patch
 popd
+#SWAP LAN WAN
+sed -i "s/eth0/eth1 eth2 eth3/" package/base-files/files/etc/board.d/99-default_network
+sed -i "s/'eth1'/'eth0'/" package/base-files/files/etc/board.d/99-default_network
 
 ##获取额外package
 #更换cryptodev-linux
@@ -253,6 +256,13 @@ latest_version="$(curl -s https://github.com/openwrt/openwrt/releases |grep -Eo 
 wget https://downloads.openwrt.org/releases/${latest_version}/targets/x86/64/packages/Packages.gz
 zgrep -m 1 "Depends: kernel (=.*)$" Packages.gz | sed -e 's/.*-\(.*\))/\1/' > .vermagic
 sed -i -e 's/^\(.\).*vermagic$/\1cp $(TOPDIR)\/.vermagic $(LINUX_DIR)\/.vermagic/' include/kernel-defaults.mk
+
+#第一次自己写着玩
+#openvpn
+svn co https://github.com/project-openwrt/openwrt/branches/master/package/lean/luci-app-openvpn-server package/lean/luci-app-openvpn-server
+#softethervpn
+svn co https://github.com/project-openwrt/openwrt/branches/master/package/lean/softethervpn5 package/lean/softethervpn5
+svn co https://github.com/project-openwrt/openwrt/branches/master/package/lean/luci-app-softethervpn package/lean/luci-app-softethervpn
 
 ##最后的收尾工作
 mkdir package/base-files/files/usr/bin
