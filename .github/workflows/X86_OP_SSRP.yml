@@ -1,13 +1,12 @@
 name: X86_OP_SSRP
 
 on:
-#  push:
-#    branches: 
-#      - master
-  schedule:
-    - cron: 10 13 * * *
+# push:
+#   branches: 
+#     - master
   watch:
-    types: started
+    types: [started]
+
 
 jobs:
   build:
