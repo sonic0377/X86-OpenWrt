@@ -1,5 +1,5 @@
 #!/bin/bash
-latest_release="$(curl -s https://github.com/openwrt/openwrt/releases |grep -Eo "v[0-9\.]+.tar.gz" |sed -n 1p)"
+latest_release="$(curl -s https://github.com/openwrt/openwrt/releases |grep -Eo "v[0-9\.]+.tar.gz" |sed -n '/19/p' |sed -n 1p)"
 curl -LO "https://github.com/openwrt/openwrt/archive/${latest_release}"
 mkdir openwrt_back
 shopt -s extglob 
@@ -17,5 +17,8 @@ cp -f ./openwrt_back/include/kernel-version.mk ./openwrt_new/include/kernel-vers
 cp -f ./openwrt_back/package/base-files/image-config.in ./openwrt_new/package/base-files/image-config.in
 cp -rf ./openwrt_back/target/linux/. ./openwrt_new/target/linux/
 cp -rf ./openwrt_new/. ./openwrt/
-git clone -b 19.07 --single-branch https://github.com/Lienol/openwrt openwrt-lienol
+git clone https://github.com/Lienol/openwrt.git openwrt-lienol
+git clone https://github.com/Lienol/openwrt-packages packages-lienol
+git clone https://github.com/Lienol/openwrt-luci luci-lienol
+git clone -b linksys-ea6350v3-mastertrack https://github.com/NoTengoBattery/openwrt NoTengoBattery
 exit 0
