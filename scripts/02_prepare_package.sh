@@ -42,8 +42,8 @@ wget -P target/linux/generic/hack-4.14/ https://github.com/coolsnowwolf/lede/raw
 # Patch LuCI 以增添SFE开关
 patch -p1 < ../PATCH/new/package/luci-app-firewall_add_sfe_switch.patch
 # SFE 相关组件
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/shortcut-fe package/new/shortcut-fe
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/fast-classifier package/new/fast-classifier
+svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/shortcut-fe package/lean/shortcut-fe
+svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/fast-classifier package/lean/fast-classifier
 cp -f ../PATCH/duplicate/shortcut-fe ./package/base-files/files/etc/init.d
 # BBR_Patch（2.0
 wget -P target/linux/generic/pending-4.14/ https://github.com/project-openwrt/openwrt/raw/openwrt-18.06/target/linux/generic/pending-4.14/607-tcp_bbr-adapt-cwnd-based-on-ack-aggregation-estimation.patch
@@ -141,18 +141,24 @@ cp -rf ../openwrt-lienol/package/diy/adguardhome ./package/new/adguardhome
 git clone -b luci https://github.com/pexcn/openwrt-chinadns-ng.git package/new/luci-app-chinadns-ng
 git clone https://github.com/pexcn/openwrt-chinadns-ng.git package/new/chinadns-ng
 #VSSR
-git clone -b master --single-branch https://github.com/jerrykuku/luci-app-vssr package/lean/luci-app-vssr
-git clone -b master --single-branch https://github.com/jerrykuku/lua-maxminddb package/lean/lua-maxminddb
+git clone -b master --depth 1 https://github.com/jerrykuku/luci-app-vssr.git package/lean/luci-app-vssr
+git clone -b master --depth 1 https://github.com/jerrykuku/lua-maxminddb.git package/lean/lua-maxminddb
+sed -i 's,default n,default y,g' package/lean/luci-app-vssr/Makefile
+sed -i '/V2ray:v2ray/d' package/lean/luci-app-vssr/Makefile
 #SSRP
 svn co https://github.com/fw876/helloworld/trunk/luci-app-ssr-plus package/lean/luci-app-ssr-plus
+#pushd package/lean
+#wget -qO - https://patch-diff.githubusercontent.com/raw/fw876/helloworld/pull/265.patch | patch -p1
+#popd
+#svn co https://github.com/project-openwrt/openwrt/trunk/package/lean/luci-app-ssr-plus package/lean/luci-app-ssr-plus
+sed -i 's,default n,default y,g' package/lean/luci-app-ssr-plus/Makefile
+sed -i '/V2ray:v2ray/d' package/lean/luci-app-ssr-plus/Makefile
 #SSRP依赖
 rm -rf ./feeds/packages/net/kcptun
 rm -rf ./feeds/packages/net/shadowsocks-libev
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/shadowsocksr-libev package/lean/shadowsocksr-libev
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/pdnsd-alt package/lean/pdnsd
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/v2ray package/lean/v2ray
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/kcptun package/lean/kcptun
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/v2ray-plugin package/lean/v2ray-plugin
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/srelay package/lean/srelay
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/microsocks package/lean/microsocks
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/dns2socks package/lean/dns2socks
@@ -169,6 +175,8 @@ svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-vlmcsd p
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/vlmcsd package/lean/vlmcsd
 #PASSWALL
 svn co https://github.com/xiaorouji/openwrt-passwall/trunk/luci-app-passwall package/new/luci-app-passwall
+sed -i 's,default n,default y,g' package/new/luci-app-passwall/Makefile
+sed -i '/V2ray:v2ray/d' package/new/luci-app-passwall/Makefile
 cp -f ../PATCH/new/script/move_2_services.sh ./package/new/luci-app-passwall/move_2_services.sh
 pushd package/new/luci-app-passwall
 bash move_2_services.sh
@@ -179,6 +187,9 @@ svn co https://github.com/xiaorouji/openwrt-passwall/trunk/brook package/new/bro
 svn co https://github.com/xiaorouji/openwrt-passwall/trunk/trojan-plus package/new/trojan-plus
 svn co https://github.com/xiaorouji/openwrt-passwall/trunk/ssocks package/new/ssocks
 svn co https://github.com/xiaorouji/openwrt-passwall/trunk/xray package/new/xray
+sed -i 's,default n,default y,g' package/new/xray/Makefile
+svn co https://github.com/xiaorouji/openwrt-passwall/trunk/v2ray package/new/v2ray
+svn co https://github.com/xiaorouji/openwrt-passwall/trunk/v2ray-plugin package/new/v2ray-plugin
 #luci-app-cpulimit
 cp -rf ../PATCH/duplicate/luci-app-cpulimit ./package/lean/luci-app-cpulimit
 svn co https://github.com/project-openwrt/openwrt/branches/master/package/ntlf9t/cpulimit package/lean/cpulimit
@@ -232,12 +243,10 @@ svn co https://github.com/openwrt/packages/trunk/libs/libcap-ng feeds/packages/l
 ln -sf ../../../feeds/packages/libs/libcap-ng ./package/feeds/packages/libcap-ng
 rm -rf ./feeds/packages/utils/collectd
 svn co https://github.com/openwrt/packages/trunk/utils/collectd feeds/packages/utils/collectd
-#SFE
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/shortcut-fe package/new/shortcut-fe
-svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/fast-classifier package/new/fast-classifier
-cp -f ../PATCH/duplicate/shortcut-fe ./package/base-files/files/etc/init.d
 #IPSEC
 svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/luci-app-ipsec-vpnd package/lean/luci-app-ipsec-vpnd
+#ipv6-helper
+svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/ipv6-helper package/lean/ipv6-helper
 #Zerotier
 svn co https://github.com/project-openwrt/openwrt/branches/master/package/lean/luci-app-zerotier package/lean/luci-app-zerotier
 cp -f ../PATCH/new/script/move_2_services.sh ./package/lean/luci-app-zerotier/move_2_services.sh
@@ -263,6 +272,11 @@ svn co https://github.com/coolsnowwolf/lede/trunk/package/lean/frp package/feeds
 svn co https://github.com/teasiu/dragino2/trunk/package/teasiu/luci-app-phtunnel package/new/luci-app-phtunnel
 svn co https://github.com/teasiu/dragino2/trunk/package/teasiu/luci-app-oray package/new/luci-app-oray
 svn co https://github.com/teasiu/dragino2/trunk/package/teasiu/phtunnel package/new/phtunnel
+#腾讯DDNS
+#svn co https://github.com/Tencent-Cloud-Plugins/tencentcloud-openwrt-plugin-ddns/trunk/tencentcloud_ddns package/lean/luci-app-tencentddns
+svn co https://github.com/1715173329/tencentcloud-openwrt-plugin-ddns/trunk/tencentcloud_ddns package/lean/luci-app-tencentddns
+#阿里DDNS
+svn co https://github.com/kenzok8/openwrt-packages/trunk/luci-app-aliddns package/new/luci-app-aliddns
 #翻译及部分功能优化
 cp -rf ../PATCH/duplicate/addition-trans-zh-master ./package/lean/lean-translate
 sed -i '/openssl/d' ./package/lean/lean-translate/files/zzz-default-settings
